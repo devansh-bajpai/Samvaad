@@ -3,9 +3,24 @@ import Navbar from './Navbar'
 
 export default function HomePage() {
   return (
-    <div>
-        <Navbar/>
+
+
+    <div
+      className="hero min-h-screen flex flex-col"
+      style={{
+        backgroundImage:
+          "url(/home_bg.png)",
+      }}
+    >
+
+
+      <Navbar />
+
+
 
     </div>
+
+
+
   )
 }
