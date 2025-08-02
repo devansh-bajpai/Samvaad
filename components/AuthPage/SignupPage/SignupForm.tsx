@@ -6,11 +6,15 @@ import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../hooks/useAuth';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { query, where, collection, getDocs } from "firebase/firestore";
 
 type Inputs = {
     email: string,
     password: string,
     confirmPassword: string,
+    username: string
 };
 
 export default function SignupForm() {
@@ -21,6 +25,19 @@ export default function SignupForm() {
     const { register, handleSubmit, setError, formState: { errors } } = useForm<Inputs>();
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         setLoading(true);
+
+        const q = query(collection(db, "users"), where("username", "==", data.username));
+        const snapshot = await getDocs(q);
+        const isUsernameAvailable = snapshot.empty;
+        if(!isUsernameAvailable){
+            setLoading(false);
+            setError("confirmPassword", {
+                type: "manual",
+                message: "Username is taken"
+            })
+            return;
+        }
+
         if (data.password != data.confirmPassword) {
             setLoading(false);
             setError("confirmPassword", {
@@ -30,7 +47,15 @@ export default function SignupForm() {
             return;
         }
         try {
-            await createUserWithEmailAndPassword(auth, data.email, data.password);
+            const userCred = await createUserWithEmailAndPassword(auth, data.email, data.password);
+            const uid = userCred.user.uid;
+
+            await setDoc(doc(db, "users", uid), {
+                email: data.email,
+                username: data.username,
+                uid: uid
+            })
+
             router.replace("/home")
         }
         catch {
@@ -47,11 +72,11 @@ export default function SignupForm() {
         }
     }
 
-     useEffect(() => {
-       if(!userLoading && user){
-        router.replace('/home');
-       }
-      }, [user, router, userLoading])
+    useEffect(() => {
+        if (!userLoading && user) {
+            router.replace('/home');
+        }
+    }, [user, router, userLoading])
 
     return (
         <>
@@ -81,6 +106,30 @@ export default function SignupForm() {
                             className="text-red-500 text-sm select-none"
                         >
                             {errors.email.message}
+                        </motion.p>
+                    )}
+                </AnimatePresence>
+
+
+
+
+
+                <input placeholder='Username' className='input m-2 focus:outline-none' {...register("username", {
+                    required: "Username is required", minLength:
+                        { value: 5, message: "Username must be atleast 5 characters long." }
+                })} />
+
+                <AnimatePresence mode="wait">
+                    {errors.username && (
+                        <motion.p
+                            key="confirm-password-error"
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -5 }}
+                            transition={{ duration: 0.3 }}
+                            className="text-red-500 text-sm select-none"
+                        >
+                            {errors.username?.message}
                         </motion.p>
                     )}
                 </AnimatePresence>
@@ -146,3 +195,4 @@ export default function SignupForm() {
         </>
     )
 }
+ 
