@@ -1,10 +1,11 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm, SubmitHandler } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/useAuth';
 
 type Inputs = {
   email: string,
@@ -14,6 +15,7 @@ type Inputs = {
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { user: user, loading: userLoading } = useAuth();
 
   const { register, handleSubmit, setError, formState: { errors } } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -37,6 +39,11 @@ export default function LoginForm() {
 
   }
 
+  useEffect(() => {
+   if(!userLoading && user){
+    router.replace('/home');
+   }
+  }, [user, router, userLoading])
 
   return (
     <>
@@ -93,10 +100,10 @@ export default function LoginForm() {
         </AnimatePresence>
 
 
-        <input className={`btn btn-primary mt-4 hover:scale-105 transition duration-500 ${loading ? "hidden" : ""} `} type="submit" />
+        <input className={`btn btn-primary mt-4 hover:scale-105 transition duration-500 ${loading ? "hidden" : ""} ${userLoading ? "hidden" : ""} `} type="submit" />
 
-          <span className={`loading loading-spinner loading-md mt-4 ${loading ? "" : "hidden"}`}></span>
-
+        <span className={`loading loading-spinner loading-md mt-4 ${loading ? "" : "hidden"}`}></span>
+        <span className={`loading loading-spinner loading-md mt-4 ${userLoading ? "" : "hidden"}`}></span>
 
       </form>
 
