@@ -24,11 +24,12 @@ type User = {
 export default function UserSearch() {
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<User[]>([]);
-
+    const [showSuggestions, setShowSuggestions] = useState(false);
 
     const { register, handleSubmit, setError, formState: { errors } } = useForm<Inputs>();
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         setLoading(true);
+        setShowSuggestions(false);
         const username = data.username;
         if (!username.trim()) return;
 
@@ -45,7 +46,7 @@ export default function UserSearch() {
         });
         setResults(users);
         setLoading(false);
-
+        setShowSuggestions(true);
     }
 
     useEffect(() => {
@@ -55,7 +56,7 @@ export default function UserSearch() {
     return (
 
         <>
-            <div className='flex flex-col'>
+            <div className='relative'>
                 <form className='flex items-center w-full' onSubmit={handleSubmit(onSubmit)}>
 
 
@@ -72,32 +73,38 @@ export default function UserSearch() {
 
                 </form>
 
-                        {results.length !=0 && (
-<ul className="list bg-base-100 rounded-box shadow-md">
-                    <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">Suggestions</li>
-                    <List
-                        height={400}        // total height of list container
-                        itemCount={results.length}
-                        itemSize={60}       // height of each row
-                        width={'100%'}      // or a fixed value like 300
-                    >
+                {results.length != 0 && showSuggestions && (
+                    <ul className="list bg-base-100 rounded-box shadow-md absolute w-full">
+                        <li className="p-4 pb-2 text-xs opacity-60 tracking-wide flex justify-between items-center">
+                            <h6>Suggestions</h6>
+                            <button onClick={() => {
+                                setShowSuggestions(false);
+                            }} className="h-[20] w-[20] btn btn-ghost btn-secondary">❌</button>
+
+                        </li>
+                        <List
+                            height={400}        // total height of list container
+                            itemCount={results.length}
+                            itemSize={60}       // height of each row
+                            width={'100%'}     // or a fixed value like 300
+                        >
 
 
-                        {({ index, style }) => (
-                            <div style={style} className="border-b p-2 flex items-center">
-                                <div>
-                                    <div>{results[index].username}</div>
+                            {({ index, style }) => (
+                                <div style={style} className="border-b p-2 flex items-center">
+                                    <div>
+                                        <div>{results[index].username}</div>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
 
 
 
-                    </List>
+                        </List>
 
 
-                    <li className="list-row">
+                        {/* <li className="list-row">
 
                         <div><img className="size-10 rounded-box" src="https://img.daisyui.com/images/profile/demo/1@94.webp" /></div>
                         <div>
@@ -110,18 +117,18 @@ export default function UserSearch() {
                         <button className="btn btn-square btn-ghost">
                             <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
                         </button>
-                    </li>
+                    </li> */}
 
 
-                </ul>
-                        )}
+                    </ul>
+                )}
 
 
             </div>
 
-                        <div className='w-full h-[100] bg-red-500'>
-                            uaegjgbhkiahebfvgeakjh
-                        </div>
+            <div className='w-full h-[100] bg-red-500'>
+                uaegjgbhkiahebfvgeakjh
+            </div>
 
 
 
