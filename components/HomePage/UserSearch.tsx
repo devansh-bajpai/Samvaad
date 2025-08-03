@@ -54,8 +54,6 @@ export default function UserSearch() {
     }, [results])
 
     return (
-
-        <>
             <div className='relative'>
                 <form className='flex items-center w-full' onSubmit={handleSubmit(onSubmit)}>
 
@@ -83,10 +81,10 @@ export default function UserSearch() {
 
                         </li>
                         <List
-                            height={400}        // total height of list container
+                            height={400}
                             itemCount={results.length}
-                            itemSize={60}       // height of each row
-                            width={'100%'}     // or a fixed value like 300
+                            itemSize={60}
+                            width={'100%'}
                         >
 
 
@@ -125,21 +123,5 @@ export default function UserSearch() {
 
 
             </div>
-
-            <div className='w-full h-[100] bg-red-500'>
-                uaegjgbhkiahebfvgeakjh
-            </div>
-
-
-
-
-
-
-
-
-
-        </>
-
-
     )
 }
