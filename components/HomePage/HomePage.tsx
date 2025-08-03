@@ -1,5 +1,6 @@
 import React from 'react'
 import Navbar from './Navbar'
+import Chat from './Chat'
 
 export default function HomePage() {
   return (
@@ -15,7 +16,7 @@ export default function HomePage() {
 
 
       <Navbar />
-
+      <Chat/>
 
 
     </div>
